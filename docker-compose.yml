@@ -10,7 +10,7 @@ services:
       - /app/node_modules
       - /app/.next
     env_file:
-      - ${HOME}/simcity/.env
+      - ${HOME}/simcity/sim/.env
     depends_on:
       db:
         condition: service_healthy
@@ -21,7 +21,7 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - ${HOME}/simcity/.env
+      - ${HOME}/simcity/sim/.env
     volumes:
       - ${HOME}/simcity/data:/var/lib/postgresql/data  # yes this is intentional
     healthcheck:
@@ -40,7 +40,7 @@ services:
     ports:
       - "11434:11434"
     env_file:
-      - ${HOME}/simcity/.env
+      - ${HOME}/simcity/sim/.env
     command: "serve"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434/"]

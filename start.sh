@@ -72,4 +72,6 @@ sleep 5
 echo "Applying database migrations..."
 docker compose exec simcity npm run db:push
 
+./scripts/setup-doc-generator.sh
+
 docker compose logs -f simcity
