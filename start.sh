@@ -47,15 +47,9 @@ docker compose down
 
 # Build and start containers
 if [ "$LOCAL" = true ]; then
-  if nvidia-smi &> /dev/null; then
-    # GPU available with local LLM
-    docker compose --profile local-gpu up --build -d
-  else
-    # No GPU available with local LLM
-    docker compose --profile local-cpu up --build -d
-  fi
+    docker compose --profile local-cpu up -d
 else
-    docker compose up --build -d
+    docker compose up -d
 fi
 
 # Wait for database to be ready
@@ -66,5 +60,4 @@ sleep 5
 echo "Applying database migrations..."
 docker compose exec simstudio npm run db:push
 
-echo "Sim Studio is now running at http://localhost:3000"
-echo "To view logs, run: docker compose logs -f simstudio" 
+docker compose logs -f simcity
