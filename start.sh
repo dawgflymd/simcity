@@ -12,6 +12,7 @@ show_help() {
     echo "Options:"
     echo "  -h, --help     Show this help message"
     echo "  --local        Use local LLM configuration with Ollama service"
+    echo "  --build        Build containers required to run the application"
     echo
     echo "Examples:"
     echo "  $0              # Start without local LLM"
@@ -24,28 +25,39 @@ show_help() {
 
 # Parse command line arguments
 LOCAL=false
+BUILD=false
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--help) show_help ;;
         --local) LOCAL=true ;;
+        --build) BUILD=true ;;
         *) echo "Unknown parameter: $1"; echo "Use -h or --help for usage information"; exit 1 ;;
     esac
     shift
 done
 
-# Check if .env file exists, if not, create from example
 if [ ! -f $SIM_DIR/.env ]; then
-  echo "Creating .env file from .env.example..."
-  cp $SIM_DIR/.env.example $SIM_DIR/.env
-  echo "Please update .env file with your configuration."
+  if [ "$BUILD" = true ]; then
+    cp $SIM_DIR/.env.example $SIM_DIR/.env
+    echo ".env file created. Please update it with your configuration."
+  else
+    echo ".env file not found! Please restart this application with flag --build, then try again."
+    sleep 5
+    exit
+  fi
 else
   echo ".env file found."
+fi
+
+# Build containers
+if [ "$BUILD" = true ]; then
+    docker compose build 
 fi
 
 # Stop any running containers
 docker compose down
 
-# Build and start containers
+# Start containers
 if [ "$LOCAL" = true ]; then
     docker compose --profile local-cpu up -d
 else
@@ -58,6 +70,6 @@ sleep 5
 
 # Apply migrations automatically
 echo "Applying database migrations..."
-docker compose exec simstudio npm run db:push
+docker compose exec simcity npm run db:push
 
 docker compose logs -f simcity
