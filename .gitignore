@@ -66,6 +66,7 @@ docs/.content-collections
 
 # database instantiation
 **/postgres_data/
+**/data/
 
 # file uploads
 uploads/

@@ -25,7 +25,7 @@ services:
     volumes:
       - ${HOME}/simcity/data:/var/lib/postgresql/data  # yes this is intentional
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]  # heads up - change this if different from your .env
       interval: 5s
       timeout: 5s
       retries: 5
