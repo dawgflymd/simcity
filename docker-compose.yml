@@ -10,7 +10,7 @@ services:
       - /app/node_modules
       - /app/.next
     env_file:
-      - ${HOME}/simcity/sim/.env
+      - ${HOME}/Desktop/projects/simcity/sim/.env
     depends_on:
       db:
         condition: service_healthy
@@ -21,29 +21,29 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - ${HOME}/simcity/sim/.env
+      - ${HOME}/Desktop/projects/simcity/sim/.env
     volumes:
-      - ${HOME}/simcity/data:/var/lib/postgresql/data  # yes this is intentional
+      - ${HOME}/Desktop/projects/simcity/data:/var/lib/postgresql/data  # yes this is intentional
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]  # heads up - change this if different from your .env
       interval: 5s
       timeout: 5s
       retries: 5
 
-  local-llm-cpu:
-    profiles:
-      - local-cpu 
-    image: ollama/ollama:latest
-    pull_policy: always
-    volumes:
-      - ${HOME}/.ollama:/root/.ollama
-    ports:
-      - "11434:11434"
-    env_file:
-      - ${HOME}/simcity/sim/.env
-    command: "serve"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # local-llm-cpu:
+  #   profiles:
+  #     - local-cpu 
+  #   image: ollama/ollama:latest
+  #   pull_policy: always
+  #   volumes:
+  #     - ${HOME}/.ollama:/root/.ollama
+  #   ports:
+  #     - "11434:11434"
+  #   env_file:
+  #     - ${HOME}/simcity/sim/.env
+  #   command: "serve"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5

@@ -8,8 +8,7 @@ SIM_DIR="$SCRIPT_DIR/sim"
 
 # Flags
 BUILD=false
-LOCAL=true ## remove before prod
-# LOCAL=false ## add before prod
+LOCAL=false 
 CMD_UP=false
 CMD_DOWN=false
 
@@ -133,10 +132,10 @@ fi
 # Start containers
 if $CMD_UP; then
     docker compose down
-    if $LOCAL; then
+    # if $LOCAL; then
         docker compose --profile local-cpu up -d
-    else
-        docker compose up -d
+    # else
+    #     docker compose up -d
     fi
     
     echo "🚀 Cluster is up. Tail logs below:"
