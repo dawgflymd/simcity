@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { createLogger } from '@/lib/logs/console-logger'
 import './globals.css'
 import { ZoomPrevention } from './zoom-prevention'
+import { TelemetryConsentDialog } from '@/app/telemetry-consent-dialog'
 
 const logger = createLogger('RootLayout')
 

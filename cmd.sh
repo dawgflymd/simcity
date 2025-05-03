@@ -8,7 +8,8 @@ SIM_DIR="$SCRIPT_DIR/sim"
 
 # Flags
 BUILD=false
-LOCAL=false
+LOCAL=true ## remove before prod
+# LOCAL=false ## add before prod
 CMD_UP=false
 CMD_DOWN=false
 
