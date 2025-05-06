@@ -146,6 +146,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="twitter:image:width" content="1200" />
         <meta name="twitter:image:height" content="675" />
         <meta name="twitter:image:alt" content="Sim Studio" />
+        <meta name="twitter:image" content="/social/twitter.png" />
         <meta property="og:image:alt" content="Sim Studio" />
         <link rel="image_src" href="/social/facebook.png" />
         {/* Instagram image meta */}
