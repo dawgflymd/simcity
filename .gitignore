@@ -75,3 +75,5 @@ uploads/
 collector-config.yaml
 docker-compose.collector.yml
 start-collector.sh
+
+**/.idea
