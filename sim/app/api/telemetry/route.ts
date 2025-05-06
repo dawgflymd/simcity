@@ -90,6 +90,7 @@ async function forwardToCollector(data: any): Promise<boolean> {
     return false
   // }
   
+<<<<<<< HEAD
   // const endpoint = process.env.TELEMETRY_ENDPOINT || 'https://telemetry.simstudio.ai/v1/traces'
   // const timeout = parseInt(process.env.TELEMETRY_TIMEOUT || '') || DEFAULT_TIMEOUT
   // 
@@ -169,6 +170,80 @@ async function forwardToCollector(data: any): Promise<boolean> {
   //   logger.error('Error preparing telemetry payload', error)
   //   return false
   // }
+=======
+  const endpoint = process.env.TELEMETRY_ENDPOINT || 'https://telemetry.simstudio.ai/v1/traces'
+  const timeout = parseInt(process.env.TELEMETRY_TIMEOUT || '') || DEFAULT_TIMEOUT
+  
+  try {
+    const timestamp = Date.now() * 1000000
+    
+    const safeAttrs = createSafeAttributes(data)
+    
+    const serviceAttrs = [
+      { key: 'service.name', value: { stringValue: 'sim-studio' } },
+      { key: 'service.version', value: { stringValue: process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0' } },
+      { key: 'deployment.environment', value: { stringValue: process.env.NODE_ENV || 'production' } }
+    ]
+    
+    const spanName = data.category && data.action ? `${data.category}.${data.action}` : 'telemetry.event'
+    
+    const payload = {
+      resourceSpans: [{
+        resource: {
+          attributes: serviceAttrs
+        },
+        instrumentationLibrarySpans: [{
+          spans: [{
+            name: spanName,
+            kind: 1,
+            startTimeUnixNano: timestamp,
+            endTimeUnixNano: timestamp + 1000000,
+            attributes: safeAttrs
+          }]
+        }]
+      }]
+    }
+    
+    // Create explicit AbortController for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      }
+      
+      const response = await fetch(endpoint, options)
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) {
+        logger.error('Telemetry collector returned error', { 
+          status: response.status,
+          statusText: response.statusText
+        })
+        return false
+      }
+      
+      return true
+    } catch (fetchError) {
+      clearTimeout(timeoutId)
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        logger.error('Telemetry request timed out', { endpoint })
+      } else {
+        logger.error('Failed to send telemetry to collector', fetchError)
+      }
+      return false
+    }
+  } catch (error) {
+    logger.error('Error preparing telemetry payload', error)
+    return false
+  }
+>>>>>>> d1d77f11959979d0f4ac59c2d2b1f4ea556f6121
 }
 
 /**

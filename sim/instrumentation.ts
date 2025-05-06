@@ -14,7 +14,11 @@
 
 import { createLogger } from '@/lib/logs/console-logger'
 
-const logger = createLogger('otel-instrumentation')
+const Sentry = process.env.NODE_ENV === 'production' 
+  ? require('@sentry/nextjs')
+  : { captureRequestError: () => {} }
+
+const logger = createLogger('OtelInstrumentation')
 
 const DEFAULT_TELEMETRY_CONFIG = {
   endpoint: process.env.TELEMETRY_ENDPOINT || 'https://telemetry.simstudio.ai/v1/traces',
@@ -30,6 +34,17 @@ const DEFAULT_TELEMETRY_CONFIG = {
 }
 
 export async function register() {
+  if (process.env.NODE_ENV === 'production') {
+    if (process.env.NEXT_RUNTIME === 'nodejs') {
+      await import('./sentry.server.config')
+    }
+
+    if (process.env.NEXT_RUNTIME === 'edge') {
+      await import('./sentry.edge.config')
+    }
+  }
+
+  // OpenTelemetry instrumentation
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     try {
       if (process.env.NEXT_TELEMETRY_DISABLED === '1') {
@@ -39,7 +54,8 @@ export async function register() {
 
       let telemetryConfig
       try {
-        telemetryConfig = require('./telemetry.config.js')
+        // Use dynamic import instead of require for ES modules
+        telemetryConfig = (await import('./telemetry.config.js')).default
       } catch (e) {
         telemetryConfig = DEFAULT_TELEMETRY_CONFIG
       }
@@ -94,3 +110,5 @@ export async function register() {
     }
   }
 } 
+
+export const onRequestError = Sentry.captureRequestError 

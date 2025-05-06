@@ -207,16 +207,24 @@ export function JiraIssueSelector({
 
         if (!response.ok) {
           const errorData = await response.json()
+          logger.error('Failed to fetch issue info:', errorData)
           throw new Error(errorData.error || 'Failed to fetch issue info')
         }
 
         const data = await response.json()
         if (data.cloudId) {
+          logger.info('Using cloud ID:', data.cloudId)
           setCloudId(data.cloudId)
         }
+        
         if (data.issue) {
+          logger.info('Successfully fetched issue:', data.issue.name)
           setSelectedIssue(data.issue)
           onIssueInfoChange?.(data.issue)
+        } else {
+          logger.warn('No issue data received in response')
+          setSelectedIssue(null)
+          onIssueInfoChange?.(null)
         }
       } catch (error) {
         logger.error('Error fetching issue info:', error)
@@ -363,6 +371,7 @@ export function JiraIssueSelector({
     }
   }, [fetchCredentials])
 
+
   // Handle open change
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -373,29 +382,19 @@ export function JiraIssueSelector({
     }
   }
 
-  // Update selected issue when value changes externally 
+  // Fetch selected issue metadata once credentials are ready or changed
+  useEffect(() => {
+    if (value && selectedCredentialId && domain && domain.includes('.') && (!selectedIssue || selectedIssue.id !== value)) {
+      fetchIssueInfo(value)
+    }
+  }, [value, selectedCredentialId, selectedIssue, domain, fetchIssueInfo])
+
+  // Keep internal selectedIssueId in sync with the value prop
   useEffect(() => {
     if (value !== selectedIssueId) {
       setSelectedIssueId(value)
-
-      // Only fetch issue info if we have a valid value
-      if (value && value.trim() !== '') {
-        // Find issue info if we have issues loaded
-        if (issues.length > 0) {
-          const issueInfo = issues.find((issue) => issue.id === value) || null
-          setSelectedIssue(issueInfo)
-          onIssueInfoChange?.(issueInfo)
-        } else if (!selectedIssue && selectedCredentialId && domain && domain.includes('.')) {
-          // If we don't have issues loaded yet but have a value, try to fetch the issue info
-          fetchIssueInfo(value)
-        }
-      } else {
-        // If value is empty or undefined, clear the selection without triggering API calls
-        setSelectedIssue(null)
-        onIssueInfoChange?.(null)
-      }
     }
-  }, [value, issues, selectedIssue, selectedCredentialId, domain, onIssueInfoChange, fetchIssueInfo])
+  }, [value])
 
   // Handle issue selection
   const handleSelectIssue = (issue: JiraIssueInfo) => {
