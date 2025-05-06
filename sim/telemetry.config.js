@@ -83,10 +83,6 @@ const config = {
   serverSide: {
     enabled: false,
   },
-<<<<<<< HEAD
-}; 
-=======
 };
 
 export default config
->>>>>>> d1d77f11959979d0f4ac59c2d2b1f4ea556f6121
